@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator | Pro Scientific Calculator</title>
+    <meta name="description" content="A premium advanced calculator with scientific functions, calculation history, and beautiful glassmorphism design.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background Effects -->
+        <div class="bg-gradient"></div>
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
+
+        <main class="calculator-wrapper">
+            <!-- Calculator Main -->
+            <div class="calculator" id="calculator">
+                <header class="calc-header">
+                    <h1>Advanced Calculator</h1>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="basicModeBtn" data-mode="basic">Basic</button>
+                        <button class="mode-btn" id="sciModeBtn" data-mode="scientific">Scientific</button>
+                    </div>
+                </header>
+
+                <!-- Display -->
+                <div class="display">
+                    <div class="expression" id="expression"></div>
+                    <div class="result" id="result">0</div>
+                </div>
+
+                <!-- Memory Buttons -->
+                <div class="memory-row">
+                    <button class="mem-btn" data-action="mc">MC</button>
+                    <button class="mem-btn" data-action="mr">MR</button>
+                    <button class="mem-btn" data-action="m+">M+</button>
+                    <button class="mem-btn" data-action="m-">M−</button>
+                    <button class="mem-btn" data-action="ms">MS</button>
+                </div>
+
+                <!-- Scientific Buttons (Hidden by default) -->
+                <div class="scientific-row" id="scientificRow">
+                    <button class="sci-btn" data-action="sin">sin</button>
+                    <button class="sci-btn" data-action="cos">cos</button>
+                    <button class="sci-btn" data-action="tan">tan</button>
+                    <button class="sci-btn" data-action="log">log</button>
+                    <button class="sci-btn" data-action="ln">ln</button>
+                    <button class="sci-btn" data-action="sqrt">√</button>
+                    <button class="sci-btn" data-action="square">x²</button>
+                    <button class="sci-btn" data-action="power">xʸ</button>
+                    <button class="sci-btn" data-action="factorial">n!</button>
+                    <button class="sci-btn" data-action="pi">π</button>
+                    <button class="sci-btn" data-action="e">e</button>
+                    <button class="sci-btn" data-action="abs">|x|</button>
+                </div>
+
+                <!-- Main Buttons Grid -->
+                <div class="buttons-grid">
+                    <button class="btn btn-secondary" data-action="clear">AC</button>
+                    <button class="btn btn-secondary" data-action="backspace">⌫</button>
+                    <button class="btn btn-secondary" data-action="percent">%</button>
+                    <button class="btn btn-operator" data-action="divide">÷</button>
+
+                    <button class="btn btn-number" data-value="7">7</button>
+                    <button class="btn btn-number" data-value="8">8</button>
+                    <button class="btn btn-number" data-value="9">9</button>
+                    <button class="btn btn-operator" data-action="multiply">×</button>
+
+                    <button class="btn btn-number" data-value="4">4</button>
+                    <button class="btn btn-number" data-value="5">5</button>
+                    <button class="btn btn-number" data-value="6">6</button>
+                    <button class="btn btn-operator" data-action="subtract">−</button>
+
+                    <button class="btn btn-number" data-value="1">1</button>
+                    <button class="btn btn-number" data-value="2">2</button>
+                    <button class="btn btn-number" data-value="3">3</button>
+                    <button class="btn btn-operator" data-action="add">+</button>
+
+                    <button class="btn btn-secondary" data-action="openParen">(</button>
+                    <button class="btn btn-number" data-value="0">0</button>
+                    <button class="btn btn-secondary" data-action="closeParen">)</button>
+                    <button class="btn btn-equals" data-action="equals">=</button>
+
+                    <button class="btn btn-number btn-decimal" data-action="decimal">.</button>
+                    <button class="btn btn-secondary" data-action="negate">±</button>
+                </div>
+
+                <!-- History Toggle -->
+                <button class="history-toggle" id="historyToggle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    History
+                </button>
+            </div>
+
+            <!-- History Panel -->
+            <aside class="history-panel" id="historyPanel">
+                <div class="history-header">
+                    <h2>History</h2>
+                    <button class="clear-history" id="clearHistory">Clear All</button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <p>No calculations yet</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Keyboard Shortcut Hint -->
+        <div class="keyboard-hint">
+            <span>⌨️ Keyboard shortcuts enabled</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
