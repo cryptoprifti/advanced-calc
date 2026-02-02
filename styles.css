@@ -8,18 +8,18 @@
     --bg-glass: rgba(255, 255, 255, 0.05);
     --bg-glass-hover: rgba(255, 255, 255, 0.1);
     --border-glass: rgba(255, 255, 255, 0.1);
-    
+
     /* Accent Colors */
     --accent-primary: #8b5cf6;
     --accent-secondary: #06b6d4;
     --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
     --accent-glow: rgba(139, 92, 246, 0.4);
-    
+
     /* Text Colors */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.7);
     --text-muted: rgba(255, 255, 255, 0.4);
-    
+
     /* Button Colors */
     --btn-number: rgba(255, 255, 255, 0.08);
     --btn-number-hover: rgba(255, 255, 255, 0.15);
@@ -27,26 +27,26 @@
     --btn-operator-hover: rgba(139, 92, 246, 0.5);
     --btn-secondary: rgba(255, 255, 255, 0.05);
     --btn-secondary-hover: rgba(255, 255, 255, 0.12);
-    
+
     /* Shadows */
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.4);
     --shadow-glow: 0 0 40px var(--accent-glow);
-    
+
     /* Spacing */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
-    
+
     /* Border Radius */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-xl: 28px;
-    
+
     /* Transitions */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.25s ease;
@@ -666,22 +666,22 @@ button {
     .calculator-wrapper {
         flex-direction: column;
     }
-    
+
     .calculator {
         width: 100%;
         max-width: 380px;
     }
-    
+
     .history-panel {
         width: 100%;
         max-width: 380px;
         max-height: 300px;
     }
-    
+
     .scientific-row {
         grid-template-columns: repeat(4, 1fr);
     }
-    
+
     .keyboard-hint {
         display: none;
     }
@@ -691,19 +691,19 @@ button {
     .app-container {
         padding: var(--spacing-md);
     }
-    
+
     .calculator {
         padding: var(--spacing-md);
     }
-    
+
     .btn {
         font-size: 1.1rem;
     }
-    
+
     .result {
         font-size: 2rem;
     }
-    
+
     .scientific-row {
         grid-template-columns: repeat(3, 1fr);
     }

@@ -21,7 +21,7 @@ class Calculator {
         this.historyPanel = document.getElementById('historyPanel');
         this.historyList = document.getElementById('historyList');
         this.scientificRow = document.getElementById('scientificRow');
-        
+
         // Initialize
         this.bindEvents();
         this.loadHistory();
@@ -60,15 +60,22 @@ class Calculator {
 
     inputNumber(num) {
         if (this.shouldResetOnNextInput) {
-            this.currentValue = num;
+            this.currentValue = num === '.' ? '0.' : num;
             this.expression = '';
             this.shouldResetOnNextInput = false;
-        } else if (this.currentValue === '0' && num !== '.') {
-            this.currentValue = num;
-        } else if (num === '.' && this.currentValue.includes('.')) {
-            return; // Prevent multiple decimals
         } else {
-            this.currentValue += num;
+            // Auto-insert multiplication if typing a number after a closing parenthesis
+            if (this.currentValue === '0' && this.expression.trim().endsWith(')')) {
+                this.expression += ' × ';
+            }
+
+            if (this.currentValue === '0' && num !== '.') {
+                this.currentValue = num;
+            } else if (num === '.' && this.currentValue.includes('.')) {
+                return; // Prevent multiple decimals
+            } else {
+                this.currentValue += num;
+            }
         }
         this.updateDisplay();
     }
@@ -175,7 +182,7 @@ class Calculator {
             this.expression = this.currentValue + ' ' + op + ' ';
             this.shouldResetOnNextInput = false;
         } else {
-            this.expression += this.currentValue + ' ' + op + ' ';
+            this.expression = this.getFullExpression() + ' ' + op + ' ';
         }
         this.currentValue = '0';
         this.updateDisplay();
@@ -184,24 +191,34 @@ class Calculator {
     appendParen(paren) {
         if (paren === '(') {
             if (this.currentValue !== '0') {
-                this.expression += this.currentValue + ' × ';
+                this.expression += this.currentValue + ' × ( ';
+            } else if (this.expression.trim().endsWith(')')) {
+                this.expression += ' × ( ';
+            } else {
+                this.expression += '( ';
             }
-            this.expression += '( ';
             this.currentValue = '0';
         } else {
-            this.expression += this.currentValue + ' ) ';
+            this.expression = this.getFullExpression() + ' ) ';
             this.currentValue = '0';
         }
         this.updateDisplay();
     }
 
+    getFullExpression() {
+        if (this.currentValue === '0' && this.expression.trim().endsWith(')')) {
+            return this.expression;
+        }
+        return this.expression + this.currentValue;
+    }
+
     calculate() {
         try {
-            let fullExpression = this.expression + this.currentValue;
-            
+            let fullExpression = this.getFullExpression();
+
             // Store the display expression before converting
             const displayExpression = fullExpression;
-            
+
             // Convert display operators to JavaScript operators
             let evalExpression = fullExpression
                 .replace(/×/g, '*')
@@ -210,19 +227,19 @@ class Calculator {
                 .replace(/\^/g, '**');
 
             // Safety check - only allow valid math characters
-            if (!/^[\d\s\+\-\*\/\.\(\)\%\*]+$/.test(evalExpression)) {
+            if (!/^[\d\s\+\-\*\/\.\(\)\%\*eE]+$/.test(evalExpression)) {
                 throw new Error('Invalid expression');
             }
 
             const result = Function('"use strict"; return (' + evalExpression + ')')();
-            
+
             if (!isFinite(result)) {
                 throw new Error('Invalid result');
             }
 
             // Format result
             const formattedResult = this.formatNumber(result);
-            
+
             // Add to history
             this.addToHistory(displayExpression, formattedResult);
 
@@ -231,11 +248,11 @@ class Calculator {
             this.currentValue = formattedResult;
             this.lastResult = result;
             this.shouldResetOnNextInput = true;
-            
+
             // Animate result
             this.resultDisplay.classList.add('animate');
             setTimeout(() => this.resultDisplay.classList.remove('animate'), 200);
-            
+
             this.updateDisplay();
         } catch (error) {
             this.showError();
@@ -387,10 +404,13 @@ class Calculator {
         display.classList.add('error');
         this.currentValue = 'Error';
         this.expression = '';
+        this.shouldResetOnNextInput = true;
         this.updateDisplay();
         setTimeout(() => {
             display.classList.remove('error');
-            this.clear();
+            if (this.currentValue === 'Error') {
+                this.clear();
+            }
         }, 1500);
     }
 
@@ -402,10 +422,10 @@ class Calculator {
     // Mode toggling
     setMode(mode) {
         this.isScientificMode = mode === 'scientific';
-        
+
         document.getElementById('basicModeBtn').classList.toggle('active', !this.isScientificMode);
         document.getElementById('sciModeBtn').classList.toggle('active', this.isScientificMode);
-        
+
         if (this.isScientificMode) {
             this.scientificRow.classList.add('visible');
         } else {
@@ -424,14 +444,14 @@ class Calculator {
             result: result,
             timestamp: Date.now()
         };
-        
+
         this.history.unshift(item);
-        
+
         // Keep only last 50 items
         if (this.history.length > 50) {
             this.history.pop();
         }
-        
+
         this.saveHistory();
         this.renderHistory();
     }
@@ -503,7 +523,7 @@ class Calculator {
     // Keyboard support
     handleKeyboard(e) {
         // Prevent default for calculator keys
-        if (/^[0-9\.\+\-\*\/\=\(\)]$/.test(e.key) || 
+        if (/^[0-9\.\+\-\*\/\=\(\)]$/.test(e.key) ||
             ['Enter', 'Backspace', 'Escape', 'Delete'].includes(e.key)) {
             e.preventDefault();
         }
