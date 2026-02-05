@@ -46,14 +46,18 @@ class Calculator {
         document.getElementById('historyToggle').addEventListener('click', () => this.toggleHistory());
         document.getElementById('clearHistory').addEventListener('click', () => this.clearHistory());
 
+        // Copy functionality
+        document.getElementById('copyBtn').addEventListener('click', () => this.copyResult());
+
         // Keyboard support
         document.addEventListener('keydown', (e) => this.handleKeyboard(e));
 
-        // Button press animation
+        // Button press animation and ripple effect
         document.querySelectorAll('.btn, .mem-btn, .sci-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
                 btn.classList.add('pressed');
                 setTimeout(() => btn.classList.remove('pressed'), 150);
+                this.createRipple(e, btn);
             });
         });
     }
@@ -419,9 +423,32 @@ class Calculator {
         this.expressionDisplay.textContent = this.expression;
     }
 
+    copyResult() {
+        const textToCopy = this.currentValue;
+        if (!navigator.clipboard) return;
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.classList.add('success');
+
+            // Revert icon/color after 2 seconds
+            setTimeout(() => {
+                copyBtn.classList.remove('success');
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
     // Mode toggling
     setMode(mode) {
+        if ((mode === 'scientific' && this.isScientificMode) ||
+            (mode === 'basic' && !this.isScientificMode)) return;
+
         this.isScientificMode = mode === 'scientific';
+        const calculator = document.getElementById('calculator');
+
+        calculator.classList.add('mode-switching');
 
         document.getElementById('basicModeBtn').classList.toggle('active', !this.isScientificMode);
         document.getElementById('sciModeBtn').classList.toggle('active', this.isScientificMode);
@@ -431,6 +458,10 @@ class Calculator {
         } else {
             this.scientificRow.classList.remove('visible');
         }
+
+        setTimeout(() => {
+            calculator.classList.remove('mode-switching');
+        }, 500);
     }
 
     // History management
@@ -592,6 +623,30 @@ class Calculator {
             btn.classList.add('pressed');
             setTimeout(() => btn.classList.remove('pressed'), 150);
         }
+    }
+
+    createRipple(event, btn) {
+        const circle = document.createElement('span');
+        const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+        const radius = diameter / 2;
+
+        const rect = btn.getBoundingClientRect();
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - rect.left - radius}px`;
+        circle.style.top = `${event.clientY - rect.top - radius}px`;
+        circle.classList.add('ripple');
+
+        const ripple = btn.getElementsByClassName('ripple')[0];
+
+        if (ripple) {
+            ripple.remove();
+        }
+
+        btn.appendChild(circle);
+
+        // Remove ripple after animation finishes
+        setTimeout(() => circle.remove(), 600);
     }
 }
 

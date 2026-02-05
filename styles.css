@@ -3,17 +3,17 @@
    =================================== */
 :root {
     /* Colors */
-    --bg-primary: #0a0a1a;
-    --bg-secondary: #12122e;
-    --bg-glass: rgba(255, 255, 255, 0.05);
-    --bg-glass-hover: rgba(255, 255, 255, 0.1);
-    --border-glass: rgba(255, 255, 255, 0.1);
+    --bg-primary: #050512;
+    --bg-secondary: #0c0c24;
+    --bg-glass: rgba(255, 255, 255, 0.07);
+    --bg-glass-hover: rgba(255, 255, 255, 0.12);
+    --border-glass: rgba(255, 255, 255, 0.15);
 
     /* Accent Colors */
-    --accent-primary: #8b5cf6;
-    --accent-secondary: #06b6d4;
-    --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
-    --accent-glow: rgba(139, 92, 246, 0.4);
+    --accent-primary: #9d6eff;
+    --accent-secondary: #00d2ff;
+    --accent-gradient: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    --accent-glow: rgba(157, 110, 255, 0.4);
 
     /* Text Colors */
     --text-primary: #ffffff;
@@ -169,12 +169,12 @@ button {
 .calculator {
     width: 380px;
     background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    box-shadow: var(--shadow-lg), var(--shadow-glow), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     animation: slideIn 0.6s ease-out;
 }
 
@@ -251,6 +251,40 @@ button {
     align-items: flex-end;
     border: 1px solid var(--border-glass);
     overflow: hidden;
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: var(--spacing-sm);
+    left: var(--spacing-sm);
+    padding: 8px;
+    color: var(--text-muted);
+    background: var(--bg-glass);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: all var(--transition-fast);
+    opacity: 0;
+    z-index: 10;
+}
+
+.display:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-glass-hover);
+    border-color: var(--border-glass);
+}
+
+.copy-btn:active {
+    transform: scale(0.9);
+}
+
+.copy-btn.success {
+    color: var(--accent-secondary);
+    border-color: var(--accent-secondary);
 }
 
 .expression {
@@ -298,22 +332,25 @@ button {
 .mem-btn {
     padding: 8px;
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-secondary);
     background: var(--btn-secondary);
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     border: 1px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .mem-btn:hover {
     background: var(--btn-secondary-hover);
     color: var(--text-primary);
     border-color: var(--border-glass);
+    transform: translateY(-1px);
 }
 
 .mem-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.95) translateY(0);
 }
 
 /* ===================================
@@ -333,35 +370,36 @@ button {
     display: grid;
     opacity: 1;
     transform: translateY(0);
-    animation: fadeSlide 0.3s ease-out;
+    animation: fadeSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes fadeSlide {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-15px) scale(0.98);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
 .sci-btn {
     padding: 10px 6px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--accent-secondary);
-    background: rgba(6, 182, 212, 0.1);
+    background: rgba(0, 210, 255, 0.1);
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
-    border: 1px solid transparent;
+    border: 1px solid rgba(0, 210, 255, 0.1);
 }
 
 .sci-btn:hover {
-    background: rgba(6, 182, 212, 0.2);
-    border-color: rgba(6, 182, 212, 0.3);
+    background: rgba(0, 210, 255, 0.2);
+    border-color: rgba(0, 210, 255, 0.4);
     transform: translateY(-2px);
+    color: var(--text-primary);
 }
 
 .sci-btn:active {
@@ -385,6 +423,7 @@ button {
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
+    border: 1px solid transparent;
 }
 
 .btn::before {
@@ -394,9 +433,14 @@ button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
     opacity: 0;
     transition: opacity var(--transition-fast);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .btn:hover::before {
@@ -404,7 +448,25 @@ button {
 }
 
 .btn:active {
-    transform: scale(0.95);
+    transform: scale(0.92) translateY(0);
+}
+
+/* Ripple effect */
+.ripple {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+    z-index: 5;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
 }
 
 /* Number Buttons */
@@ -449,17 +511,18 @@ button {
 .btn-equals {
     background: var(--accent-gradient);
     color: var(--text-primary);
-    font-weight: 600;
-    box-shadow: 0 4px 20px var(--accent-glow);
+    font-weight: 700;
+    box-shadow: 0 4px 20px var(--accent-glow), 0 0 15px var(--accent-glow);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .btn-equals:hover {
-    box-shadow: 0 6px 30px var(--accent-glow);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 32px var(--accent-glow), 0 0 25px var(--accent-glow);
+    transform: translateY(-3px);
 }
 
 .btn-equals:active {
-    transform: scale(0.95) translateY(0);
+    transform: scale(0.92) translateY(0);
 }
 
 /* Decimal Button */
@@ -510,15 +573,15 @@ button {
     width: 280px;
     max-height: 580px;
     background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-xl);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-lg), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     display: none;
     flex-direction: column;
-    animation: slideInRight 0.4s ease-out;
+    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .history-panel.visible {
@@ -615,6 +678,7 @@ button {
     border-radius: var(--radius-md);
     margin-bottom: var(--spacing-sm);
     border: 1px solid transparent;
+    border-left: 3px solid transparent;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
@@ -622,6 +686,8 @@ button {
 .history-item:hover {
     background: var(--bg-glass-hover);
     border-color: var(--border-glass);
+    border-left-color: var(--accent-primary);
+    transform: translateX(4px);
 }
 
 .history-item .expression {
@@ -689,11 +755,16 @@ button {
 
 @media (max-width: 400px) {
     .app-container {
-        padding: var(--spacing-md);
+        padding: var(--spacing-sm);
     }
 
     .calculator {
         padding: var(--spacing-md);
+        border-radius: var(--radius-lg);
+    }
+
+    .buttons-grid {
+        gap: var(--spacing-xs);
     }
 
     .btn {
@@ -701,11 +772,16 @@ button {
     }
 
     .result {
-        font-size: 2rem;
+        font-size: 1.8rem;
+    }
+
+    .expression {
+        font-size: 0.8rem;
     }
 
     .scientific-row {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--spacing-xs);
     }
 }
 
