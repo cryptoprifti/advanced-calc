@@ -186,7 +186,14 @@ class Calculator {
             this.expression = this.currentValue + ' ' + op + ' ';
             this.shouldResetOnNextInput = false;
         } else {
-            this.expression = this.getFullExpression() + ' ' + op + ' ';
+            const fullExpression = this.getFullExpression().trim();
+
+            // If expression already ends with an operator, replace it instead of appending
+            if (/[+\-×÷^]$/.test(fullExpression)) {
+                this.expression = fullExpression.slice(0, -1).trimEnd() + ' ' + op + ' ';
+            } else {
+                this.expression = fullExpression + ' ' + op + ' ';
+            }
         }
         this.currentValue = '0';
         this.updateDisplay();
@@ -265,6 +272,12 @@ class Calculator {
 
     calculatePercent() {
         const value = parseFloat(this.currentValue);
+
+        if (isNaN(value) || !isFinite(value)) {
+            this.showError();
+            return;
+        }
+
         this.currentValue = this.formatNumber(value / 100);
         this.updateDisplay();
     }
@@ -355,17 +368,26 @@ class Calculator {
     }
 
     memoryAdd() {
-        this.memory += parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory += value;
         this.hasMemory = true;
     }
 
     memorySubtract() {
-        this.memory -= parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory -= value;
         this.hasMemory = true;
     }
 
     memoryStore() {
-        this.memory = parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory = value;
         this.hasMemory = true;
     }
 
@@ -554,7 +576,7 @@ class Calculator {
     // Keyboard support
     handleKeyboard(e) {
         // Prevent default for calculator keys
-        if (/^[0-9\.\+\-\*\/\=\(\)]$/.test(e.key) ||
+        if (/^[0-9\.\+\-\*\/\=\(\)\%]$/.test(e.key) ||
             ['Enter', 'Backspace', 'Escape', 'Delete'].includes(e.key)) {
             e.preventDefault();
         }
