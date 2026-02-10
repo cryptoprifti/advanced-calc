@@ -14,6 +14,7 @@ class Calculator {
         this.history = [];
         this.isScientificMode = false;
         this.shouldResetOnNextInput = false;
+        this.isRadians = false;
 
         // DOM Elements
         this.resultDisplay = document.getElementById('result');
@@ -21,10 +22,14 @@ class Calculator {
         this.historyPanel = document.getElementById('historyPanel');
         this.historyList = document.getElementById('historyList');
         this.scientificRow = document.getElementById('scientificRow');
+        this.angleToggleBtn = document.getElementById('angleToggle');
+        this.themeToggleBtn = document.getElementById('themeToggle');
 
         // Initialize
         this.bindEvents();
         this.loadHistory();
+        this.loadTheme();
+        this.updateAngleIndicator();
     }
 
     bindEvents() {
@@ -46,6 +51,10 @@ class Calculator {
         document.getElementById('historyToggle').addEventListener('click', () => this.toggleHistory());
         document.getElementById('clearHistory').addEventListener('click', () => this.clearHistory());
 
+        // Utility controls
+        this.angleToggleBtn.addEventListener('click', () => this.toggleAngleMode());
+        this.themeToggleBtn.addEventListener('click', () => this.toggleTheme());
+
         // Copy functionality
         document.getElementById('copyBtn').addEventListener('click', () => this.copyResult());
 
@@ -53,7 +62,7 @@ class Calculator {
         document.addEventListener('keydown', (e) => this.handleKeyboard(e));
 
         // Button press animation and ripple effect
-        document.querySelectorAll('.btn, .mem-btn, .sci-btn').forEach(btn => {
+        document.querySelectorAll('.btn, .mem-btn, .sci-btn, .utility-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 btn.classList.add('pressed');
                 setTimeout(() => btn.classList.remove('pressed'), 150);
@@ -178,6 +187,15 @@ class Calculator {
             case 'abs':
                 this.scientificOp('abs');
                 break;
+            case 'angle':
+                this.toggleAngleMode();
+                break;
+            case 'ans':
+                this.insertAnswer();
+                break;
+            case 'rand':
+                this.insertRandom();
+                break;
         }
     }
 
@@ -186,7 +204,14 @@ class Calculator {
             this.expression = this.currentValue + ' ' + op + ' ';
             this.shouldResetOnNextInput = false;
         } else {
-            this.expression = this.getFullExpression() + ' ' + op + ' ';
+            const fullExpression = this.getFullExpression().trim();
+
+            // If expression already ends with an operator, replace it instead of appending
+            if (/[+\-×÷^]$/.test(fullExpression)) {
+                this.expression = fullExpression.slice(0, -1).trimEnd() + ' ' + op + ' ';
+            } else {
+                this.expression = fullExpression + ' ' + op + ' ';
+            }
         }
         this.currentValue = '0';
         this.updateDisplay();
@@ -265,6 +290,12 @@ class Calculator {
 
     calculatePercent() {
         const value = parseFloat(this.currentValue);
+
+        if (isNaN(value) || !isFinite(value)) {
+            this.showError();
+            return;
+        }
+
         this.currentValue = this.formatNumber(value / 100);
         this.updateDisplay();
     }
@@ -286,13 +317,13 @@ class Calculator {
 
         switch (op) {
             case 'sin':
-                result = Math.sin(value * Math.PI / 180); // Degrees
+                result = Math.sin(this.toAngle(value));
                 break;
             case 'cos':
-                result = Math.cos(value * Math.PI / 180);
+                result = Math.cos(this.toAngle(value));
                 break;
             case 'tan':
-                result = Math.tan(value * Math.PI / 180);
+                result = Math.tan(this.toAngle(value));
                 break;
             case 'log':
                 result = Math.log10(value);
@@ -340,6 +371,50 @@ class Calculator {
         this.updateDisplay();
     }
 
+    insertAnswer() {
+        if (this.lastResult === null) return;
+
+        this.currentValue = this.formatNumber(this.lastResult);
+        this.shouldResetOnNextInput = true;
+        this.updateDisplay();
+    }
+
+    insertRandom() {
+        this.currentValue = this.formatNumber(Math.random());
+        this.shouldResetOnNextInput = true;
+        this.updateDisplay();
+    }
+
+    toAngle(value) {
+        return this.isRadians ? value : (value * Math.PI / 180);
+    }
+
+    toggleAngleMode() {
+        this.isRadians = !this.isRadians;
+        this.updateAngleIndicator();
+    }
+
+    updateAngleIndicator() {
+        if (!this.angleToggleBtn) return;
+        this.angleToggleBtn.textContent = this.isRadians ? 'RAD' : 'DEG';
+        this.angleToggleBtn.classList.toggle('active', this.isRadians);
+    }
+
+    loadTheme() {
+        const savedTheme = localStorage.getItem('calculatorTheme');
+        const isLightTheme = savedTheme === 'light';
+
+        document.body.classList.toggle('theme-light', isLightTheme);
+        this.themeToggleBtn.textContent = isLightTheme ? '☀️ Light' : '🌙 Dark';
+    }
+
+    toggleTheme() {
+        const isLightTheme = !document.body.classList.contains('theme-light');
+        document.body.classList.toggle('theme-light', isLightTheme);
+        localStorage.setItem('calculatorTheme', isLightTheme ? 'light' : 'dark');
+        this.themeToggleBtn.textContent = isLightTheme ? '☀️ Light' : '🌙 Dark';
+    }
+
     // Memory functions
     memoryClear() {
         this.memory = 0;
@@ -355,17 +430,26 @@ class Calculator {
     }
 
     memoryAdd() {
-        this.memory += parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory += value;
         this.hasMemory = true;
     }
 
     memorySubtract() {
-        this.memory -= parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory -= value;
         this.hasMemory = true;
     }
 
     memoryStore() {
-        this.memory = parseFloat(this.currentValue);
+        const value = parseFloat(this.currentValue);
+        if (isNaN(value) || !isFinite(value)) return;
+
+        this.memory = value;
         this.hasMemory = true;
     }
 
@@ -554,7 +638,7 @@ class Calculator {
     // Keyboard support
     handleKeyboard(e) {
         // Prevent default for calculator keys
-        if (/^[0-9\.\+\-\*\/\=\(\)]$/.test(e.key) ||
+        if (/^[0-9\.\+\-\*\/\=\(\)\%]$/.test(e.key) ||
             ['Enter', 'Backspace', 'Escape', 'Delete'].includes(e.key)) {
             e.preventDefault();
         }
@@ -614,6 +698,15 @@ class Calculator {
         else if (e.key === '%') {
             this.handleAction('percent');
             this.highlightButton('[data-action="percent"]');
+        }
+        // Toggle angle mode
+        else if (e.key.toLowerCase() === 'r') {
+            this.toggleAngleMode();
+        }
+        // Insert last answer
+        else if (e.key.toLowerCase() === 'a') {
+            this.handleAction('ans');
+            this.highlightButton('[data-action="ans"]');
         }
     }
 
